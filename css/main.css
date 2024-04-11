@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css?family=Montserrat:700,900&subset=cyrillic");
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i&subset=cyrillic');
+
+@keyframes header_anim {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+
+header{
+    position: fixed;
+    width: 100%;
+    background: #a8e4a0;
+    padding-top: 0;
+}
+
+
+h1 {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  margin-left: 1em;
+}
+
+h2 {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  margin-left: 1em;
+  color: #ffffff;
+}
+
+.col {
+  padding-left: 80px;
+  padding-top: 120px;
+}
+
+.x {
+  padding-left: 80px;
+  padding-top: 150px;
+}
+
+button {
+    border-radius: 4px;
+    transition: border-radius 0.5s ease-in;
+    background: #ffcc00;
+}
+
+button:hover {
+    border-radius: 16px;
+}
+
+input {
+  margin-left: 100px;
+}
