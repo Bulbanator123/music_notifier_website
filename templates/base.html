@@ -11,11 +11,22 @@
     <link rel="stylesheet" href="/static/main.css">
   </head>
   <body>
-  <header><h2>{{ title }}</h2>
+  <header>
+      <div>
+          <h2>{{ title }}</h2>
     <form action="" method="get">
-    <input name="s" placeholder="Искать здесь..." type="search">
-    <button type="submit">Поиск</button>
+        <input name="s" placeholder="Искать здесь..." type="search">
+        <button type="submit">Поиск</button>
     </form>
+      </div>
+        {% if current_user.is_authenticated %}
+        <a class="navbar-brand" href="/logout">{{ current_user.name }}</a>
+    {% else %}
+        <p>
+            <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
+            <a class="btn btn-success" href="/login">Войти</a>
+        </p>
+    {% endif %}
   </header>
   <main role="main" class="container">
     {% block content %}{% endblock %}

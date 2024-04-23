@@ -3,3 +3,4 @@ requests
 python-dotenv
 sqlalchemy
 sqlalchemy_serializer
+flask_wtf

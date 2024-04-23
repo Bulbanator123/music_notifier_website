@@ -1,2 +1,2 @@
-from . import artists
-from . import music
+from . import users
+from . import favours
