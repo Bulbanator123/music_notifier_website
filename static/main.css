@@ -1,6 +1,10 @@
 @import url("https://fonts.googleapis.com/css?family=Montserrat:700,900&subset=cyrillic");
 @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i&subset=cyrillic');
 
+body {
+  margin: 0; /* обнулим отступы*/
+}
+
 @keyframes header_anim {
   from {
     transform: translateX(-120%);
@@ -14,10 +18,15 @@
 header{
     position: fixed;
     width: 100%;
+    height: 80px;
     background: #a8e4a0;
     padding-top: 0;
     display: flex;
     justify-content: space-around;
+}
+
+.under_header{
+    padding-top: 90px;
 }
 
 
