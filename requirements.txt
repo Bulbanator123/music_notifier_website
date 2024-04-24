@@ -1,7 +1,9 @@
-flask
-requests
-python-dotenv
-sqlalchemy
+flask~=3.0.2
+requests~=2.31.0
+python-dotenv~=1.0.1
+sqlalchemy~=2.0.29
 sqlalchemy_serializer
 flask_wtf
 flask_login
+werkzeug~=3.0.2
+wtforms~=3.1.2

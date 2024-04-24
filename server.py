@@ -3,8 +3,8 @@ import requests
 import dotenv
 import datetime
 import random
-from flask import Flask, render_template, make_response, jsonify
-from flask_login import LoginManager, login_required
+from flask import Flask, render_template, make_response, jsonify, redirect
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from data import db_session
 from data.users import User
 from data.favours import Favours
@@ -17,6 +17,9 @@ dotenv.load_dotenv()
 TOKEN = os.environ.get("API_TOKEM_DISCOGS")
 SECRET_KEY = os.environ.get("SECRET_KEY")
 # ------ENV---------
+
+MAIN_WINDOW_RESPONSE = {}
+
 # ----константы-----
 
 app = Flask(__name__)  # создание приложения
@@ -31,37 +34,13 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
-@app.errorhandler(404)
-def not_found(_):
-    return make_response(jsonify({'error': 'Not found'}), 404)
-
-
-@app.errorhandler(400)
-def bad_request(_):
-    return make_response(jsonify({'error': 'Bad Request'}), 400)
-
-
 @app.route('/')  # главный роут
 def main_route():
-    url1 = f"https://api.discogs.com/database/search?q=&type=release&format=MP3&year={datetime.datetime.now().year}&page={random.randint(1, 972)}&per_page=10&token={TOKEN}"
-    response1 = requests.get(url1).json()
-    url2 = f"https://api.discogs.com/database/search?q=&type=release&format=album&year={datetime.datetime.now().year}&page={random.randint(1, 1000)}&per_page=10&token={TOKEN}"
-    response2 = requests.get(url2).json()
-    params = {"title": "Music Notifier", "music": [[el["title"], el["cover_image"]] for el in response1["results"]],
+    response1 = MAIN_WINDOW_RESPONSE["response1"]
+    response2 = MAIN_WINDOW_RESPONSE["response2"]
+    params = {"music": [[el["title"], el["cover_image"]] for el in response1["results"]],
               "album": [[el["title"], el["cover_image"]] for el in response2["results"]]}
     return render_template("index_music.html", **params)
-
-
-@app.route('/artist')  # роут артиста
-def artist_route():
-    params = {"title": "Артист"}
-    return render_template("artist.html", **params)
-
-
-@app.route('/artist/music')  # роут музыки
-def music_route():
-    params = {"title": "Музыка"}
-    return render_template("music.html", **params)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -104,6 +83,17 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
+@app.route('/user/<id>')
+@login_required
+def user(id):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter_by(id=id).first()
+    favours = db_sess.query(Favours).filter(Favours.id == id, Favours.user == current_user).first()
+    if not favours:
+        favours = []
+    return render_template('profile.html', user=user, favours=favours)
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -111,12 +101,21 @@ def logout():
     return redirect("/")
 
 
-async def update_API():  # обновление данных из api
-    pass
+def update_API():  # обновление данных из api
+    global MAIN_WINDOW_RESPONSE
+    url1 = f"https://api.discogs.com/database/search?q=&type=release&format=MP3&year={datetime.datetime.now().year}" \
+           f"&page={random.randint(1, 972)}&per_page=10&token={TOKEN}"
+    response1 = requests.get(url1).json()
+    url2 = f"https://api.discogs.com/database/search?q=&type=release&format=album&year={datetime.datetime.now().year}" \
+           f"&page={random.randint(1, 1000)}&per_page=10&token={TOKEN}"
+    response2 = requests.get(url2).json()
+    return {"response1": response1, "response2": response2}
 
 
 def main():  # отдельно-вынесенная функция main
+    global MAIN_WINDOW_RESPONSE
     db_session.global_init("db/blogs.db")
+    MAIN_WINDOW_RESPONSE = update_API()
     app.run(port=8080, host='127.0.0.1')
 
 

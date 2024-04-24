@@ -29,6 +29,9 @@ header{
     padding-top: 90px;
 }
 
+.main_title{
+    text-decoration: none;
+}
 
 h1 {
   font-family: Verdana, Geneva, Tahoma, sans-serif;

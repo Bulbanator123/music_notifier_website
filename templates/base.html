@@ -13,14 +13,14 @@
   <body>
   <header>
       <div>
-          <h2>{{ title }}</h2>
-    <form action="" method="get">
-        <input name="s" placeholder="Искать здесь..." type="search">
-        <button type="submit">Поиск</button>
-    </form>
+          <a class="main_title" href="/"><h2>Music Notifier</h2></a>
+          <form action="" method="get">
+              <input name="s" placeholder="Искать здесь..." type="search">
+              <button type="submit">Поиск</button>
+          </form>
       </div>
         {% if current_user.is_authenticated %}
-        <a class="navbar-brand" href="/logout">{{ current_user.name }}</a>
+        <a class="navbar-brand" href="/user/{{ current_user.id }}">{{ current_user.name }}</a>
     {% else %}
         <p>
             <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
