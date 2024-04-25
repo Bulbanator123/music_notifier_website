@@ -1,14 +1,16 @@
+import base64
 import os
 import requests
 import dotenv
 import datetime
 import random
-from flask import Flask, render_template, make_response, jsonify, redirect
+from flask import Flask, render_template, redirect, request, send_from_directory, url_for
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from data import db_session
 from data.users import User
 from data.favours import Favours
 from forms.user import RegisterForm, LoginForm
+from werkzeug.utils import secure_filename
 
 # ------импорты------
 
@@ -24,6 +26,9 @@ MAIN_WINDOW_RESPONSE = {}
 
 app = Flask(__name__)  # создание приложения
 app.config['SECRET_KEY'] = SECRET_KEY
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
+app.config['UPLOAD_PATH'] = "uploads"
+app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -38,7 +43,6 @@ def load_user(user_id):
 def main_route():
     response1 = MAIN_WINDOW_RESPONSE["response1"]
     response2 = MAIN_WINDOW_RESPONSE["response2"]
-    print(response1, response2)
     params = {"music": [[el["title"], el["cover_image"]] for el in response1["results"]],
               "album": [[el["title"], el["cover_image"]] for el in response2["results"]]}
     return render_template("index_music.html", **params)
@@ -60,7 +64,7 @@ def reqister():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            about=form.about.data
+            about=form.about.data,
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -84,15 +88,33 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
-@app.route('/user/<id>')
+@app.route('/uploads/<filename>')
+def upload(filename):
+    return send_from_directory(app.config['UPLOAD_PATH'], filename)
+
+
+@app.route('/user/<id>', methods=["GET", "POST"])
 @login_required
 def user(id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter_by(id=id).first()
     favours = db_sess.query(Favours).filter(Favours.id == id, Favours.user == current_user).first()
+    user_filename = os.listdir(app.config['UPLOAD_PATH'])
+    file = user_filename[0]
+    for el in user_filename:
+        if el == f"{user.id}.jpeg":
+            file = el
+            break
     if not favours:
         favours = []
-    return render_template('profile.html', user=user, favours=favours)
+    if request.method == "POST":
+        file = request.files["file"]
+        filename = secure_filename(f"{id}.jpeg")
+        file_ext = os.path.splitext(filename)[1]
+        if file_ext not in app.config['UPLOAD_EXTENSIONS']:
+            file.save(os.path.join(app.config['UPLOAD_PATH'], filename))
+        return redirect(f"/user/{user.id}")
+    return render_template('profile.html', user=user, favours=favours, file=file)
 
 
 @app.route('/logout')
@@ -100,6 +122,14 @@ def user(id):
 def logout():
     logout_user()
     return redirect("/")
+
+
+@app.route('/artist/<name>')
+def search_artist(name):
+    url = f"https://api.discogs.com/database/search?q={name}&type=artist&token={TOKEN}"
+    response = requests.get(url).json()
+    return render_template('musicmaker.html',
+                           artist=[response["results"][0]["cover_image"], response["results"][0]["title"]])
 
 
 def update_API():  # обновление данных из api

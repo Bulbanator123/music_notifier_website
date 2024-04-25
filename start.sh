@@ -11,7 +11,9 @@ VIRTUALENV=./venv
 
 if [ ! -d $VIRTUALENV ]; then
   python3 -m venv $VIRTUALENV
+  python3 -m pip install --upgrade pip
 fi
+
 
 # Install pip into virtual environment
 if [ ! -f $VIRTUALENV/bin/pip ]; then
@@ -22,4 +24,4 @@ fi
 $VIRTUALENV/bin/pip install -r requirements.txt
 
 # Run your glorious application
-$VIRTUALENV/bin/python3 server.py
+$VIRTUALENV/bin/python server.py

@@ -2,15 +2,12 @@
 
 {% block content %}
     <h1>User: {{ user.name }}</h1>
-    <img src="{{ user.avatar(128) }}">
-    <form method="post" action="upload.php" formenctype="multipart/form-data">
-        <label for="upload">Upload your picture:</label>
-        <input type="file" name="upload" id="upload">
+    <img src="{{ url_for('upload', filename=file) }}">
+    <form method="POST" action="/user/{{ user.id }}" enctype="multipart/form-data">
+        <input class="ok" type="file" name="file">
+        <button class="op">Отправить</button>
     </form>
     {% for favour in favours %}
-    <p>
-    {{ post.author.username }} says: <b>{{ post.body }}</b>
-    </p>
     {% endfor %}
 <a class="btn btn-danger" href="/logout"> Выйти из аккаунта </a>
 {% endblock %}
