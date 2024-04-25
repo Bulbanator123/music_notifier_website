@@ -38,6 +38,7 @@ def load_user(user_id):
 def main_route():
     response1 = MAIN_WINDOW_RESPONSE["response1"]
     response2 = MAIN_WINDOW_RESPONSE["response2"]
+    print(response1, response2)
     params = {"music": [[el["title"], el["cover_image"]] for el in response1["results"]],
               "album": [[el["title"], el["cover_image"]] for el in response2["results"]]}
     return render_template("index_music.html", **params)

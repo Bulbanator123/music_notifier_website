@@ -2,8 +2,11 @@
 
 {% block content %}
     <h1>User: {{ user.name }}</h1>
-    <hr>
-
+    <img src="{{ user.avatar(128) }}">
+    <form method="post" action="upload.php" formenctype="multipart/form-data">
+        <label for="upload">Upload your picture:</label>
+        <input type="file" name="upload" id="upload">
+    </form>
     {% for favour in favours %}
     <p>
     {{ post.author.username }} says: <b>{{ post.body }}</b>

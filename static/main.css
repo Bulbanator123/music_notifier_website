@@ -78,4 +78,6 @@ input {
     border-radius: 16px;
 }
 
-
+p{
+    max-width: 50%;
+}
