@@ -9,6 +9,12 @@
     </form>
     <p>{{user.about}}</p>
     {% for favour in favours %}
+        <img src="{{favour.png}}">
+        <p>{{favour.title}}</p>
+        <p>Последние треки:</p>
+        {% for el in favour.music.split("-------") %}
+            <p>{{el}}</p>
+        {% endfor %}
     {% endfor %}
 <a class="btn btn-danger" href="/logout"> Выйти из аккаунта </a>
 {% endblock %}

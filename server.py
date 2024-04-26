@@ -98,7 +98,7 @@ def upload(filename):
 def user(id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter_by(id=id).first()
-    favours = db_sess.query(Favours).filter(Favours.id == id, Favours.user == current_user).first()
+    favours = db_sess.query(Favours).filter(Favours.id == id, Favours.user == current_user).all()
     user_filename = os.listdir(app.config['UPLOAD_PATH'])
     file = user_filename[0]
     for el in user_filename:
@@ -107,6 +107,12 @@ def user(id):
             break
     if not favours:
         favours = []
+    else:
+        for favour in favours:
+            url = f"https://api.discogs.com/artists/{favour.api_id}/releases?year"
+            response = requests.get(url).json()["releases"][-10:]
+            response1 = [el["title"] for el in response]
+            favour.music = "-------".join(response1)
     if request.method == "POST":
         file = request.files["file"]
         filename = secure_filename(f"{id}.jpeg")
@@ -127,19 +133,46 @@ def logout():
 @app.route('/artist/<name>')
 def artist(name):
     url = f"https://api.discogs.com/database/search?q={name}&type=artist&token={TOKEN}"
-    response = requests.get(url).json()["results"][0]
-    return render_template('musicmaker.html',
-                           artist=[response["cover_image"], response["title"], response["uri"]])
+    db_sess = db_session.create_session()
+    if requests.get(url).json()["results"]:
+        response = requests.get(url).json()["results"][0]
+        flavor = db_sess.query(Favours).filter(Favours.id == current_user.id, Favours.user == current_user,
+                                      Favours.title == response["title"]).first()
+        if flavor:
+            return render_template('musicmaker.html',
+                               artist=[response["cover_image"], response["title"], response["uri"]], flavor=True)
+        else:
+            return render_template('musicmaker.html',
+                                   artist=[response["cover_image"], response["title"], response["uri"]], flavor=False)
+    else:
+        return redirect("/")
 
 
-@app.route('/artist_like/<name>')
+@app.route('/artist_like/<name>', methods=["POST"])
 def artist_like(name):
+    db_sess = db_session.create_session()
+    url = f"https://api.discogs.com/database/search?q={name}&type=artist&token={TOKEN}"
+    response = requests.get(url).json()["results"][0]
+    favour = Favours(title=response["title"], png=response["cover_image"], user_id=current_user.id,
+                     api_id=response["id"])
+    favour.music = ""
+    if db_sess.query(Favours).filter(Favours.id == current_user.id, Favours.user == current_user,
+                                     Favours.title == response["title"],
+                                     Favours.png == response["cover_image"]).first():
+        favour = db_sess.query(Favours).filter(Favours.id == current_user.id, Favours.user == current_user,
+                                     Favours.title == response["title"],
+                                     Favours.png == response["cover_image"]).first()
+        db_sess.delete(favour)
+    else:
+        db_sess.add(favour)
+    db_sess.commit()
     return redirect(f"/artist/{name}")
 
 
 @app.route("/search_artist", methods=["POST"])
 def search_artist():
     name = request.form["s"]
+    db_sess = db_session.create_session()
     return redirect(f"/artist/{name}")
 
 

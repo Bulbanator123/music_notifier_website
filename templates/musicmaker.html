@@ -6,6 +6,12 @@
     </figure>
     {% if current_user.is_authenticated %}
     <form method="POST" action="/artist_like/{{ artist[1] }}" enctype="multipart/form-data">
-        <div class="scattering"></div></form>
+        {% if not flavor %}
+        <button type="submit">Отслеживать</button>
+        {% else %}
+        <button type="submit">Перестать отслеживать</button>
+        {% endif %}
+        <div class="scattering"></div>
+    </form>
     {% endif %}
 {% endblock %}
