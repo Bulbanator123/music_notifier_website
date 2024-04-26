@@ -3,6 +3,7 @@
     <figure class="paint">
         <img src="{{ artist[0] }}" width="300" height="300">
         <figcaption>{{ artist[1] }}</figcaption>
+        <a href="{{ artist[2] }}">{{ artist[1] }}</a>
     </figure>
     {% if current_user.is_authenticated %}
     <div class="scattering"></div>
