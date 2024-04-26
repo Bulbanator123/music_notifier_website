@@ -98,7 +98,7 @@ def upload(filename):
 def user(id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter_by(id=id).first()
-    favours = db_sess.query(Favours).filter(Favours.id == id, Favours.user == current_user).all()
+    favours = db_sess.query(Favours).filter(Favours.user_id == id, Favours.user == current_user).all()
     user_filename = os.listdir(app.config['UPLOAD_PATH'])
     file = user_filename[0]
     for el in user_filename:
@@ -136,7 +136,7 @@ def artist(name):
     db_sess = db_session.create_session()
     if requests.get(url).json()["results"]:
         response = requests.get(url).json()["results"][0]
-        flavor = db_sess.query(Favours).filter(Favours.id == current_user.id, Favours.user == current_user,
+        flavor = db_sess.query(Favours).filter(Favours.user_id == current_user.id,
                                       Favours.title == response["title"]).first()
         if flavor:
             return render_template('musicmaker.html',
@@ -156,12 +156,10 @@ def artist_like(name):
     favour = Favours(title=response["title"], png=response["cover_image"], user_id=current_user.id,
                      api_id=response["id"])
     favour.music = ""
-    if db_sess.query(Favours).filter(Favours.id == current_user.id, Favours.user == current_user,
-                                     Favours.title == response["title"],
-                                     Favours.png == response["cover_image"]).first():
-        favour = db_sess.query(Favours).filter(Favours.id == current_user.id, Favours.user == current_user,
-                                     Favours.title == response["title"],
-                                     Favours.png == response["cover_image"]).first()
+    if db_sess.query(Favours).filter(Favours.user_id == current_user.id,
+                                     Favours.title == response["title"]).first():
+        favour = db_sess.query(Favours).filter(Favours.user_id == current_user.id,
+                                     Favours.title == response["title"]).first()
         db_sess.delete(favour)
     else:
         db_sess.add(favour)
