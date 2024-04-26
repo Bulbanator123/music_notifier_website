@@ -7,8 +7,8 @@
      <div class="row">
      {% for el in music %}
      <div class="col">
-        <figure><img src="{{ el[1] }}" width="100" height="100">
-         <figcaption>{{ el[0] }}</figcaption>
+         <figure><a href="https://www.discogs.com/ru{{el[2]}}"><img src="{{ el[1] }}" width="100" height="100">
+         <figcaption>{{ el[0] }}</figcaption></a>
         </figure>
      </div>
      {% endfor %}
@@ -21,8 +21,8 @@
      <div class="row">
      {% for el in album %}
      <div class="col">
-        <figure><img src="{{ el[1] }}" width="100" height="100">
-         <figcaption>{{ el[0] }}</figcaption>
+        <figure><a href="https://www.discogs.com/ru{{el[2]}}"><img src="{{ el[1] }}" width="100" height="100">
+            <figcaption>{{ el[0] }}</figcaption></a>
         </figure>
      </div>
      {% endfor %}

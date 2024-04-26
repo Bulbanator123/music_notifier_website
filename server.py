@@ -43,8 +43,8 @@ def load_user(user_id):
 def main_route():
     response1 = MAIN_WINDOW_RESPONSE["response1"]
     response2 = MAIN_WINDOW_RESPONSE["response2"]
-    params = {"music": [[el["title"], el["cover_image"]] for el in response1["results"]],
-              "album": [[el["title"], el["cover_image"]] for el in response2["results"]]}
+    params = {"music": [[el["title"], el["cover_image"], el["uri"]] for el in response1["results"]],
+              "album": [[el["title"], el["cover_image"], el["uri"]] for el in response2["results"]]}
     return render_template("index_music.html", **params)
 
 
@@ -127,9 +127,14 @@ def logout():
 @app.route('/artist/<name>')
 def artist(name):
     url = f"https://api.discogs.com/database/search?q={name}&type=artist&token={TOKEN}"
-    response = requests.get(url).json()
+    response = requests.get(url).json()["results"][0]
     return render_template('musicmaker.html',
-                           artist=[response["results"][0]["cover_image"], response["results"][0]["title"]])
+                           artist=[response["cover_image"], response["title"], response["uri"]])
+
+
+@app.route('/artist_like/<name>')
+def artist_like(name):
+    return redirect(f"/artist/{name}")
 
 
 @app.route("/search_artist", methods=["POST"])

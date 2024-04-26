@@ -28,11 +28,18 @@ header{
 .under_header{
     padding-top: 90px;
 }
-
+.paint{
+    padding-left: 80px;
+}
+figcaption{
+    text-decoration: none;
+}
 .main_title{
     text-decoration: none;
 }
-
+.a{
+    text-decoration: none;
+}
 h1 {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
   margin-left: 1em;
