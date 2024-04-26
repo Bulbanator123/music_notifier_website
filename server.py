@@ -125,11 +125,17 @@ def logout():
 
 
 @app.route('/artist/<name>')
-def search_artist(name):
+def artist(name):
     url = f"https://api.discogs.com/database/search?q={name}&type=artist&token={TOKEN}"
     response = requests.get(url).json()
     return render_template('musicmaker.html',
                            artist=[response["results"][0]["cover_image"], response["results"][0]["title"]])
+
+
+@app.route("/search_artist", methods=["POST"])
+def search_artist():
+    name = request.form["s"]
+    return redirect(f"/artist/{name}")
 
 
 def update_API():  # обновление данных из api
